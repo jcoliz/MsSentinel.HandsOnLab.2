@@ -76,6 +76,14 @@ module role './AzDeploy.Bicep/Storage/blobdatacontribrole.bicep' = {
 // TODO: Deploy app configuration store
 // https://learn.microsoft.com/en-us/azure/azure-app-configuration/quickstart-container-apps?tabs=azure-portal
 
+module config './AzDeploy.Bicep/App/appConfiguration.bicep' = {
+  name: 'config'
+  params: {
+    suffix: suffix
+    location: location
+  }
+}
+
 // TODO: Assign "App Configuration Data Reader" to the app
 
 // TODO: Enter config properties for: Container, Folder, Blob Endpoint
