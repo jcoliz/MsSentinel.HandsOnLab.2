@@ -19,6 +19,9 @@ param location string = resourceGroup().location
 @description('Name for blob storage container.')
 param containerName string = 'blobz'
 
+@description('Name for blob storage folder.')
+param folderName string = 'foldr'
+
 // Deploy Microsoft Sentinel Workspace
 
 module workspace './AzDeploy.Bicep/SecurityInsights/sentinel-complete.bicep' = {
@@ -60,6 +63,20 @@ module blobApp 'AzDeploy.Bicep/App/containerAppCompleteWeb.bicep' = {
     location: location
     webImageName: 'jcoliz/mssentinel-synthetic:latest'
     ingressPort: 8080
+    env: [
+      {
+        name: 'BLOBSTORAGE__CONTAINER'
+        value: containerName
+      }
+      {
+        name: 'BLOBSTORAGE__FOLDER'
+        value: folderName
+      }
+      {
+        name: 'BLOBSTORAGE__ENDPOINT'
+        value: storage.outputs.storageEndpoint.blob
+      }
+    ]
   }
 }
 
@@ -72,21 +89,6 @@ module role './AzDeploy.Bicep/Storage/blobdatacontribrole.bicep' = {
     principalType: 'ServicePrincipal'
   }
 }
-
-// TODO: Deploy app configuration store
-// https://learn.microsoft.com/en-us/azure/azure-app-configuration/quickstart-container-apps?tabs=azure-portal
-
-module config './AzDeploy.Bicep/App/appConfiguration.bicep' = {
-  name: 'config'
-  params: {
-    suffix: suffix
-    location: location
-  }
-}
-
-// TODO: Assign "App Configuration Data Reader" to the app
-
-// TODO: Enter config properties for: Container, Folder, Blob Endpoint
 
 output sentinelWorkspaceName string = workspace.outputs.logAnalyticsName
 output storageName string = storage.outputs.storageName
