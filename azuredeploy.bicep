@@ -6,6 +6,7 @@
 //    * Sentinel-enabled Log Analytics Workspace
 //    * Azure Storage Account
 //    * Blob Storage container
+//    * Container app to push blobs
 //
 
 @description('Unique suffix for all resources in this deployment')
@@ -48,10 +49,36 @@ module container './AzDeploy.Bicep/Storage/storcontainer.bicep' = {
   }
 }
 
-// TODO: Deploy blob creation app
-// This will be added once the blob creation app is implemented!
-// For now, generate blobs manually
+// Deploy container app
+
+// This is a placeholder, until we have the actual blob creation
+// container image pushed
+module blobApp 'AzDeploy.Bicep/App/containerAppCompleteWeb.bicep' = {
+  name: 'blobApp'
+  params: {
+    suffix: suffix
+    location: location
+    webImageName: 'jcoliz/mssentinel-synthetic:latest'
+    ingressPort: 8080
+  }
+}
+
+// Assign storage contributor rights for the blob-pushing app
+
+module role './AzDeploy.Bicep/Storage/blobdatacontribrole.bicep' = {
+  params: {
+    principalId: blobApp.outputs.principal
+    containerFullName: container.outputs.name
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// TODO: Deploy app configuration store
+// https://learn.microsoft.com/en-us/azure/azure-app-configuration/quickstart-container-apps?tabs=azure-portal
+
+// TODO: Assign "App Configuration Data Reader" to the app
+
+// TODO: Enter config properties for: Container, Folder, Blob Endpoint
 
 output sentinelWorkspaceName string = workspace.outputs.logAnalyticsName
 output storageName string = storage.outputs.storageName
-output blobEndpoint string = storage.outputs.storageEndpoint.blob
