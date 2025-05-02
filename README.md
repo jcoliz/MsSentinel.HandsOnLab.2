@@ -49,7 +49,7 @@ To deploy these, run the [Deploy-Services.ps1](./Deploy-Services.ps1) script. Su
 Azure datacenter location according to your preference.
 
 ```dotnetcli
-.\Deploy-Services.ps1 -ResourceGroup mssentinel-lab-2 -Location westus -Container <choose a name>
+.\Deploy-Services.ps1 -ResourceGroup mssentinel-lab-2 -Location westus
 ```
 
 When this script completes, it will pass along some helpful information. Be sure to record the displayed endpoints URL.
@@ -58,6 +58,14 @@ When this script completes, it will pass along some helpful information. Be sure
 Deployed sentinel workspace sentinel-redacted
 Deployed storage account storage000redacted
 Deployed container application capp-redacted
+
+Use these values for your connector:
+* Blob URL: https://storage000redacted.blob.core.windows.net/blobz
+* Blob folder: foldr
+* Blob location: westus
+* Blob resource group: mssentinel-lab-2
+* Blob subscription ID: redacted
+* Event grid topic: ** leave blank **
 
 When finished, run:
 az group delete --name mssentinel-lab-2
