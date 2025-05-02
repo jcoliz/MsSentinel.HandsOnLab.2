@@ -22,6 +22,9 @@ param containerName string = 'blobz'
 @description('Name for blob storage folder.')
 param folderName string = 'foldr'
 
+@description('Container image to use.')
+param imageName string = 'jcoliz/mssentinel-azblob:latest'
+
 // Deploy Microsoft Sentinel Workspace
 
 module workspace './AzDeploy.Bicep/SecurityInsights/sentinel-complete.bicep' = {
@@ -52,29 +55,52 @@ module container './AzDeploy.Bicep/Storage/storcontainer.bicep' = {
   }
 }
 
-// Deploy container app
+// Deploy Container App Environment
 
-// This is a placeholder, until we have the actual blob creation
-// container image pushed
-module blobApp 'AzDeploy.Bicep/App/containerAppCompleteWeb.bicep' = {
-  name: 'blobApp'
+module cenv './AzDeploy.Bicep/App/managedEnvironments.bicep' = {
+  name: 'cenv'
   params: {
     suffix: suffix
     location: location
-    webImageName: 'jcoliz/mssentinel-synthetic:latest'
-    ingressPort: 8080
-    env: [
-      {
-        name: 'BLOBSTORAGE__CONTAINER'
-        value: containerName
-      }
-      {
-        name: 'BLOBSTORAGE__FOLDER'
-        value: folderName
-      }
-      {
-        name: 'BLOBSTORAGE__ENDPOINT'
-        value: storage.outputs.storageEndpoint.blob
+    logAnalyticsName: workspace.outputs.logAnalyticsName
+  }
+}
+
+// Deploy container app
+
+module capp './AzDeploy.Bicep/App/containerApp.bicep' = {
+  name: 'capp'
+  params: {
+    suffix: suffix
+    location: location
+    containerAppEnvName: cenv.outputs.name
+    external: false
+    containers: [
+      {        
+        name: 'app'
+        image: imageName
+        resources: {
+          cpu: json('0.25')
+          memory: '.5Gi'
+        }
+        env: [
+          {
+            name: 'BLOBSTORAGE__CONTAINER'
+            value: containerName
+          }
+          {
+            name: 'BLOBSTORAGE__FOLDER'
+            value: folderName
+          }
+          {
+            name: 'BLOBSTORAGE__ENDPOINT'
+            value: storage.outputs.storageEndpoint.blob
+          }
+          {
+            name: 'BLOBSTORAGE__PERIOD'
+            value: '00:01:00'
+          }
+        ]
       }
     ]
   }
@@ -84,7 +110,7 @@ module blobApp 'AzDeploy.Bicep/App/containerAppCompleteWeb.bicep' = {
 
 module role './AzDeploy.Bicep/Storage/blobdatacontribrole.bicep' = {
   params: {
-    principalId: blobApp.outputs.principal
+    principalId: capp.outputs.principal
     containerFullName: container.outputs.name
     principalType: 'ServicePrincipal'
   }
