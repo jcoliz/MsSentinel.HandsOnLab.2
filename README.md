@@ -56,8 +56,9 @@ When this script completes, it will pass along some helpful information. Be sure
 
 ```dotnetcli
 Deployed sentinel workspace sentinel-redacted
-Deployed sotrage account storage000redacted
+Deployed storage account storage000redacted
+Deployed container application capp-redacted
 
 When finished, run:
-az group delete --name mssentinel-lab-1
+az group delete --name mssentinel-lab-2
 ```

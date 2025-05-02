@@ -20,9 +20,12 @@ Write-Output ""
 
 $sentinelWorkspaceName = $result.properties.outputs.sentinelWorkspaceName.value
 $storageName = $result.properties.outputs.storageName.value
+$appName = $result.properties.outputs.appName.value
 
 Write-Output "Deployed sentinel workspace $sentinelWorkspaceName"
-Write-Output "Deployed sotrage account $storageName"
+Write-Output "Deployed storage account $storageName"
+Write-Output "Deployed container application $appName"
+Write-Output ""
 
 Write-Output "When finished, run:"
 Write-Output "az group delete --name $ResourceGroup"

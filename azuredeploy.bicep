@@ -118,3 +118,4 @@ module role './AzDeploy.Bicep/Storage/blobdatacontribrole.bicep' = {
 
 output sentinelWorkspaceName string = workspace.outputs.logAnalyticsName
 output storageName string = storage.outputs.storageName
+output appName string = capp.outputs.name
