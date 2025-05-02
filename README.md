@@ -70,3 +70,39 @@ Use these values for your connector:
 When finished, run:
 az group delete --name mssentinel-lab-2
 ```
+
+## Validate Resources
+
+TODO: Steps to take to ensure that deployment produced expected results
+
+1. Check deployment logs
+1. Check resource group
+1. Check app logs
+1. Check storage container
+
+## Deploy solution &amp; connector
+
+TODO: Steps to deploy solution and connector
+
+1. Enable Sentinel health monitoring
+1. Deploy solution
+1. Check deployment logs
+1. Deploy connector
+1. Check deployment logs
+
+## Validate data flow
+
+TODO: Steps to troubleshoot data flow
+
+1. Check that the storage account has an "Microsoft.Storage.BlobCreated" Event Subscription, with expected prefix folder.
+1. Click into the Event Subscription details. Ensure the "Endpoint" is {name}-notification
+1. Check that the Storage account has two queues, {name}-dlq and {name}-notification.
+1. Check the role assignments on each queue. Ensure expected App Registration (e.g. "ScubaSentinelToStorageProd") has Storage Queue Data Contributor role. You can verify it's the correct app by clicking on its name, and comparing Object ID on the "Enterprise Application Overview" page with the Service Principal ID in the connector deployment page.
+1. Check the metrics on Events page for Storage Account. Look for Published Events and Delivered Events to jump up to 1. Refresh as needed.
+1. Check the {name}-notification queue quickly. Look for a message to arrive in that queue with folder and file name matching the file you just added. 
+1. Now we wait! Could be up to 40 minutes. 10 is more common.
+1. Refresh regularly for a few minutes, could be up to 10. The event should disappear from the queue because it has been picked up by the connector.
+1. Check the metrics for the DCR. Look for "Log Ingestion Requests per minute" to come up.
+1. Check the Sentinel Logs, run a simple KQL query for just the table name. Look for matching data to come up.
+1. Visit the connector page. Look for green status, and indication that "last log received" was recently.
+1. Problems? Check Sentinel Health table
